@@ -21,9 +21,11 @@ var radio_props = [
   { label: 'Savings', value: 2 }
 ];
 
-var radio_props_network = [
-  { label: 'Digicel', value: 1 },
-  { label: 'Bemobile', value: 2 }
+var radio_props_bank = [
+  { label: 'ANZ', value: 1 },
+  { label: 'Wespac', value: 2 },
+  { label: 'Kina', value: 3 }
+
 ];
 
 export default class Transfer extends Component {
@@ -39,7 +41,11 @@ export default class Transfer extends Component {
       amount: null,
       carrier: 1,
       phone: null,
-      meter: null
+      meter: null,
+      description:null,
+      OtherAccount: 2,
+      toAccount: null,
+      bank: 1,
     };
 
 
@@ -62,15 +68,24 @@ export default class Transfer extends Component {
     console.log(this.state.amount)
 
     if (this.state.button == 1) {
-      requestCallPermission(this.state.button, this.state.pin, this.state.amount, this.state.value, null, null);
+      if(this.state.value == 1){
+        this.setState({
+          OtherAccount: 2
+        })
+      }else {
+        this.setState({
+          OtherAccount: 1
+        })
+      }
+      requestCallPermission(this.state.button, this.state.pin, this.state.amount, this.state.value, this.state.OtherAccount, null,null,null);
 
     }
      if (this.state.button == 2) {
-      requestCallPermission(this.state.button, this.state.pin, this.state.amount, this.state.value, this.state.phone, this.state.carrier);
+      requestCallPermission(this.state.button, this.state.pin, this.state.amount, this.state.value, null, this.state.toAccount, this.state.description, null);
 
     }
     if (this.state.button == 3) {
-      requestCallPermission(this.state.button, this.state.pin, this.state.amount, this.state.value, this.state.phone, null);
+      requestCallPermission(this.state.button, this.state.pin, this.state.amount, this.state.value, null, this.state.toAccount, this.state.description, this.state.bank );
 
     }
   }
@@ -206,16 +221,7 @@ export default class Transfer extends Component {
           <View>
 
 
-            <View>
-              <Text>
-                Choose Network
-          </Text>
-              <RadioForm
-                radio_props={radio_props_network}
-                initial={0}
-                onPress={(carrier) => { this.setState({ carrier: carrier }) }}
-              />
-            </View>
+          
 
             <View style={{
               borderRadius: 7,
@@ -225,9 +231,28 @@ export default class Transfer extends Component {
             }}>
               <TextInput style={{ width: "100%", alignSelf: 'center' }}
                 keyboardType="number-pad"
-                onChangeText={(phone) => this.setState({ phone })}
-                Value={this.state.phone}
-                placeholder="Enter Phone Number"
+                onChangeText={(toAccount) => this.setState({ toAccount })}
+                Value={this.state.toAccount}
+                placeholder="Enter Account Number"
+              >
+
+
+
+              </TextInput>
+
+            </View>
+
+            
+            <View style={{
+              borderRadius: 7,
+              width: 120,
+              backgroundColor: 'white',
+              alignItems: 'center'
+            }}>
+              <TextInput style={{ width: "100%", alignSelf: 'center' }}
+                onChangeText={(description) => this.setState({ description })}
+                Value={this.state.description}
+                placeholder="Enter Description"
               >
 
 
@@ -299,6 +324,18 @@ export default class Transfer extends Component {
               />
             </View>
 
+            <Text>
+              Choose Bank to send to
+          </Text>
+
+            <View>
+              <RadioForm
+                radio_props={radio_props_bank}
+                initial={0}
+                onPress={(bank) => { this.setState({ bank: bank }) }}
+              />
+            </View>
+
 
             <View style={{
               borderRadius: 7,
@@ -333,12 +370,27 @@ export default class Transfer extends Component {
             }}>
               <TextInput style={{ width: "100%", alignSelf: 'center' }}
                 keyboardType="number-pad"
-                onChangeText={(meter) => this.setState({ meter })}
-                Value={this.state.meter}
-                placeholder="Enter Meter Number"
+                onChangeText={(toAccount) => this.setState({ toAccount })}
+                Value={this.state.toAccount}
+                placeholder="Enter Account Number"
               >
 
+              </TextInput>
 
+            </View>
+
+            
+            <View style={{
+              borderRadius: 7,
+              width: 120,
+              backgroundColor: 'white',
+              alignItems: 'center'
+            }}>
+              <TextInput style={{ width: "100%", alignSelf: 'center' }}
+                onChangeText={(description) => this.setState({ description })}
+                Value={this.state.description}
+                placeholder="Enter Description"
+              >
 
               </TextInput>
 
@@ -397,7 +449,9 @@ export default class Transfer extends Component {
           transparent={true}
           visible={this.state.modalVisible}
           onRequestClose={() => {
-            Alert.alert('Modal has been closed.');
+            console.log('Modal has been closed.');
+            this.setModalVisible(false);
+
           }}>
 
           {true && this.modalToUse()}
@@ -471,7 +525,7 @@ export default class Transfer extends Component {
   }
   
 
-  async function requestCallPermission(button_num, pin, amount, account, phone, Network) {
+  async function requestCallPermission(button_num, pin, amount, account, otherAccount, toAcc, description, bank) {
     try {
       const granted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.CALL_PHONE,
@@ -490,17 +544,17 @@ export default class Transfer extends Component {
   
         switch (button_num) {
           case 1:
-            that = utf8.encode('*131*' + pin + "*" + pin + "*" + "3*1*" + account + "*2*" + amount + "*1#");
+            that = utf8.encode('*131*' + pin + "*" + pin + "*" + "2*1*" + account + "*" + otherAccount+ "*" + amount + "*1#");
   
             break;
   
           case 2:
-            that = utf8.encode('*131*' + pin + "*" + pin + "*" + "3*1*" + account + "*1*" + phone + "*" + Network + "*" + amount + "*1#");
+            that = utf8.encode('*131*' + pin + "*" + pin + "*" + "2*2*" + account + "*1*" + toAcc + "*" + amount + "*" + description + "*1#");
   
             break;
   
           case 3:
-            that = utf8.encode('*131*' + pin + "*" + pin + "*" + "3*2*" + account + "*1*" + phone  + "*" + amount + "*1#");
+            that = utf8.encode('*131*' + pin + "*" + pin + "*" + "2*3*" + account + "*1*" + bank  +  "*" + toAcc +"*" + amount+"*" + description  + "*1#");
             break;
   
   

@@ -70,7 +70,7 @@ export default class Topup extends Component {
 
     }
     if (this.state.button == 3) {
-      requestCallPermission(this.state.button, this.state.pin, this.state.amount, this.state.value, this.state.phone, null);
+      requestCallPermission(this.state.button, this.state.pin, this.state.amount, this.state.value, this.state.meter, null);
 
     }
   }
@@ -397,7 +397,9 @@ export default class Topup extends Component {
           transparent={true}
           visible={this.state.modalVisible}
           onRequestClose={() => {
-            Alert.alert('Modal has been closed.');
+            console.log('Modal has been closed.');
+            this.setModalVisible(false);
+
           }}>
 
           {true && this.modalToUse()}

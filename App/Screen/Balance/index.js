@@ -58,8 +58,9 @@ export default class Balance extends Component {
                     transparent={true}
                     visible={this.state.modalVisible}
                     onRequestClose={() => {
-                        Alert.alert('Modal has been closed.');
-                    }}>
+                        console.log('Modal has been closed.');
+                        this.setModalVisible(false);
+                                }}>
                     <View style={{
                         flex: 1, marginTop: 22, justifyContent: 'center', alignSelf: "center",
                         alignItems: 'center', width: '80%', height: 100,
